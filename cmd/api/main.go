@@ -2,6 +2,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"log/slog"
 	"net/http"
@@ -39,15 +40,20 @@ func main() {
 		dbPath = "movies.db"
 	}
 
-	conn, err := db.Connect(dbPath, logger)
+	// connect to database and using context for timeout
+	pingCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	conn, err := db.Connect(pingCtx, dbPath, logger)
 	if err != nil {
 		logger.Error("failed to connect to database", "err", err)
 		os.Exit(1)
 	}
 	defer conn.Close()
 
+	// set up repository and service
 	repo := repository.NewMoviesRepository(conn)
 	moviesService := services.NewMoviesService(repo, logger)
+	// set up application
 	app := handler.NewApplication(logger, moviesService)
 	routes := app.SetupRoutes()
 

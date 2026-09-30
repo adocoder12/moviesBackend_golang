@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log/slog"
@@ -12,16 +13,17 @@ const schema = `
 CREATE TABLE IF NOT EXISTS movies (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	title TEXT NOT NULL,
-	year INTEGER NOT NULL
+	year INTEGER NOT NULL,
+	director TEXT NOT NULL
 );`
 
-func Connect(path string, logger *slog.Logger) (*sql.DB, error) {
+func Connect(ctx context.Context, path string, logger *slog.Logger) (*sql.DB, error) {
 	conn, err := sql.Open("sqlite3", path)
 	if err != nil {
 		return nil, fmt.Errorf("open database: %w", err)
 	}
 
-	if err := conn.Ping(); err != nil {
+	if err := conn.PingContext(ctx); err != nil {
 		conn.Close()
 		return nil, fmt.Errorf("ping database: %w", err)
 	}
