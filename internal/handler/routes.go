@@ -2,10 +2,10 @@ package handler
 
 import "net/http"
 
-func SetupRoutes() http.Handler {
+func (app *Application) SetupRoutes() http.Handler {
 	mux := http.NewServeMux()
 	//public routes
-	mux.HandleFunc("GET /{$}", HomeHandler)
-	mux.HandleFunc("GET /health", HealthHandler)
+	mux.HandleFunc("GET /{$}", app.HomeHandler)
+	mux.HandleFunc("GET /health", app.HealthHandler)
 	return mux
 }

@@ -34,10 +34,13 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
+	infoLog := slog.New(slog.NewTextHandler(os.Stdout, nil))
+	errorLog := slog.New(slog.NewTextHandler(os.Stderr, nil))
+	app := handler.NewApplication(errorLog, infoLog)
 
 	server := &http.Server{
 		Addr:         ":" + port,
-		Handler:      handler.SetupRoutes(),
+		Handler:      app.SetupRoutes(),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,

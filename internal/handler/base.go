@@ -5,10 +5,13 @@ import (
 	"net/http"
 )
 
-func HomeHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "hello from home")
+func (app *Application) HomeHandler(w http.ResponseWriter, r *http.Request) {
+	app.infoLog.Info("home handler")
+
+	fmt.Fprint(w, "hello from home, good ado!!\n")
 }
 
-func HealthHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "ok")
+func (app *Application) HealthHandler(w http.ResponseWriter, r *http.Request) {
+	app.infoLog.Info("health handler")
+	fmt.Fprint(w, "ok\n")
 }
