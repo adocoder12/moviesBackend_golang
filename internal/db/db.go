@@ -14,7 +14,9 @@ CREATE TABLE IF NOT EXISTS movies (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	title TEXT NOT NULL,
 	year INTEGER NOT NULL,
-	director TEXT NOT NULL
+	director TEXT NOT NULL,
+	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  	updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );`
 
 func Connect(ctx context.Context, path string, logger *slog.Logger) (*sql.DB, error) {

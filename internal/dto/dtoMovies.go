@@ -30,7 +30,7 @@ func (r *RequestMovie) ToModel() *model.Movie {
 }
 
 func FromModel(m *model.Movie) ResponseMovie {
-	return ResponseMovie{
+	response := ResponseMovie{
 		ID:        m.ID,
 		Title:     m.Title,
 		Year:      m.Year,
@@ -38,4 +38,6 @@ func FromModel(m *model.Movie) ResponseMovie {
 		CreatedAt: m.CreatedAt,
 		UpdatedAt: m.UpdatedAt,
 	}
+
+	return response
 }

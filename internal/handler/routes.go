@@ -5,8 +5,10 @@ import "net/http"
 func (app *Application) SetupRoutes() http.Handler {
 	mux := http.NewServeMux()
 	//public routes
-	mux.HandleFunc("GET /{$}", app.HomeHandler)
 	mux.HandleFunc("GET /health", app.HealthHandler)
-	mux.HandleFunc("GET /movies", app.GetAllMoviesHandler)
+	mux.HandleFunc("GET /api/v1/movies", app.GetAllMoviesHandler)
+	mux.HandleFunc("GET /api/v1/movies/{id}", app.GetMovieByIdHandler)
+	mux.HandleFunc("POST /api/v1/movies", app.CreateMovieHandler)
+
 	return mux
 }
