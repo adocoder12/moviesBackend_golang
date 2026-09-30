@@ -4,7 +4,7 @@ import "net/http"
 
 // serverError logs the real error and sends a generic 500 to the client.
 func (app *Application) serverError(w http.ResponseWriter, r *http.Request, err error) {
-	app.errorLog.Error("server error",
+	app.logger.Error("server error",
 		"err", err,
 		"method", r.Method,
 		"uri", r.URL.RequestURI(),

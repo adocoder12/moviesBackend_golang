@@ -1,14 +1,17 @@
 package handler
 
-import "log/slog"
+import (
+	"log/slog"
+
+	"github.com/adocoder12/moviesBackend_golang/internal/services"
+)
 
 // Application holds the shared dependencies of the handlers.
-// The database will be added here later.
 type Application struct {
-	errorLog *slog.Logger
-	infoLog  *slog.Logger
+	logger *slog.Logger
+	movies *services.MoviesService
 }
 
-func NewApplication(errorLog, infoLog *slog.Logger) *Application {
-	return &Application{errorLog: errorLog, infoLog: infoLog}
+func NewApplication(logger *slog.Logger, movies *services.MoviesService) *Application {
+	return &Application{logger: logger, movies: movies}
 }
