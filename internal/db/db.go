@@ -24,12 +24,12 @@ func Connect(ctx context.Context, path string, logger *slog.Logger) (*sql.DB, er
 	}
 
 	if err := conn.PingContext(ctx); err != nil {
-		conn.Close()
+		_ = conn.Close()
 		return nil, fmt.Errorf("ping database: %w", err)
 	}
 
 	if err := runMigrations(conn); err != nil {
-		conn.Close()
+		_ = conn.Close()
 		return nil, err
 	}
 

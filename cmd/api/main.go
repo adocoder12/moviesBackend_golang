@@ -48,7 +48,12 @@ func main() {
 		logger.Error("failed to connect to database", "err", err)
 		os.Exit(1)
 	}
-	defer conn.Close()
+	// close database connection on exit
+	defer func() {
+		if err := conn.Close(); err != nil {
+			logger.Error("close database", "err", err)
+		}
+	}()
 
 	// set up repository and service
 	repo := repository.NewMoviesRepository(conn)

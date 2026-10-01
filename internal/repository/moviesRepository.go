@@ -49,7 +49,7 @@ func (r *MoviesRepository) GetMovies(ctx context.Context) ([]model.Movie, error)
 	if err != nil {
 		return nil, fmt.Errorf("movies repo: get movies: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	movies := []model.Movie{}
 	for rows.Next() {
