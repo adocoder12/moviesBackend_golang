@@ -1,8 +1,12 @@
 package model
 
 import (
+	"errors"
 	"time"
 )
+
+var ErrNotFound = errors.New("movie not found")
+var ErrDuplicate = errors.New("movie already exists")
 
 type Movie struct {
 	ID    int    `db:"id"`

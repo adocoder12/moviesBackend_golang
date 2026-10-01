@@ -3,21 +3,19 @@ package db
 import (
 	"context"
 	"database/sql"
+	"embed"
+	"errors"
 	"fmt"
 	"log/slog"
 
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/sqlite3"
+	"github.com/golang-migrate/migrate/v4/source/iofs"
 	_ "github.com/mattn/go-sqlite3"
 )
 
-const schema = `
-CREATE TABLE IF NOT EXISTS movies (
-	id INTEGER PRIMARY KEY AUTOINCREMENT,
-	title TEXT NOT NULL,
-	year INTEGER NOT NULL,
-	director TEXT NOT NULL,
-	created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  	updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-);`
+//go:embed migrations/*.sql
+var migrationsFS embed.FS
 
 func Connect(ctx context.Context, path string, logger *slog.Logger) (*sql.DB, error) {
 	conn, err := sql.Open("sqlite3", path)
@@ -30,7 +28,7 @@ func Connect(ctx context.Context, path string, logger *slog.Logger) (*sql.DB, er
 		return nil, fmt.Errorf("ping database: %w", err)
 	}
 
-	if err := initializeSchema(conn); err != nil {
+	if err := runMigrations(conn); err != nil {
 		conn.Close()
 		return nil, err
 	}
@@ -39,9 +37,25 @@ func Connect(ctx context.Context, path string, logger *slog.Logger) (*sql.DB, er
 	return conn, nil
 }
 
-func initializeSchema(db *sql.DB) error {
-	if _, err := db.Exec(schema); err != nil {
-		return fmt.Errorf("initialize schema: %w", err)
+func runMigrations(db *sql.DB) error {
+	src, err := iofs.New(migrationsFS, "migrations")
+	if err != nil {
+		return fmt.Errorf("migrations source: %w", err)
+	}
+
+	driver, err := sqlite3.WithInstance(db, &sqlite3.Config{})
+	if err != nil {
+		return fmt.Errorf("migrations driver: %w", err)
+	}
+
+	m, err := migrate.NewWithInstance("iofs", src, "sqlite3", driver)
+	if err != nil {
+		return fmt.Errorf("migrations init: %w", err)
+	}
+
+	// Do not call m.Close(): with WithInstance it would close your *sql.DB.
+	if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
+		return fmt.Errorf("run migrations: %w", err)
 	}
 	return nil
 }

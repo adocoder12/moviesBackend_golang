@@ -12,17 +12,19 @@ func (app *Application) serverError(w http.ResponseWriter, r *http.Request, err 
 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 }
 
-// clientError sends the given status (400, 404, ...) with its standard text.
-func (app *Application) clientError(w http.ResponseWriter, status int) {
-	http.Error(w, http.StatusText(status), status)
-}
-
-// notFound is a shortcut for a 404.
+// notFound sends a 404.
 func (app *Application) notFound(w http.ResponseWriter) {
-	app.clientError(w, http.StatusNotFound)
+	http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 }
 
-func (app *Application) badRequest(w http.ResponseWriter, r *http.Request, err error) {
-	// Optional: log bad requests if helpful for debugging client input issues
-	app.clientError(w, http.StatusBadRequest)
+// badRequest logs the problem and sends a 400 with the error message.
+// Always pass a non-nil error.
+func (app *Application) badRequest(w http.ResponseWriter, r *http.Request, msg string, err error) {
+	app.logger.Warn("bad request",
+		"msg", msg,
+		"err", err,
+		"method", r.Method,
+		"uri", r.URL.RequestURI(),
+	)
+	http.Error(w, msg, http.StatusBadRequest)
 }

@@ -21,6 +21,12 @@ type RequestMovie struct {
 	Director string `json:"director"`
 }
 
+type UpdateMovieRequest struct {
+	Title    *string `json:"title"`
+	Year     *int    `json:"year"`
+	Director *string `json:"director"`
+}
+
 func (r *RequestMovie) ToModel() *model.Movie {
 	return &model.Movie{
 		Title:    r.Title,
